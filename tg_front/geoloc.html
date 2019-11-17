@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>getLocc</title>
+    <meta charset="utf-8" />
+</head>
+<body>
+	<h1 align='center'>Get your current location in different ways!</h1>
+	
+	<!-- Создаём три кнопки по центру -->
+<div style='text-align: center; padding-bottom: 20pt;'>   
+<input id="getcurpos" type="button" value="get current position" onclick="getcurpos">
+<input id="watpos" type="button" value="watch position" onclick="watpos">
+<input id="stopwatpos" type="button" value="stop watching position" onclick="stopwatpos">
+</div>
+
+	<!-- Делаем костыльный дебаггер -->
+<div id="elem">Нет</div>
+	<!-- пишем скрипт с функциями для соответствующих кнопулек -->
+<script>
+document.getElementById("getcurpos").onclick = function (){
+navigator.geolocation.getCurrentPosition( 
+function(position) {
+	let elem = document.getElementById("elem");
+	let text = position.coords.latitude + ", "  + position.coords.longitude
+	console.log(position)
+	let HTML = {
+            accuracy: position.coords.accuracy,
+            altitude: position.coords.altitude,
+            altitudeAccuracy: position.coords.altitudeAccuracy,
+            heading: position.coords.heading,
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            speed: position.coords.speed,
+          }
+          elem.innerHTML = JSON.stringify(HTML);
+	
+}
+);
+}
+
+document.getElementById("watpos").onclick = function (){
+let watchID = navigator.geolocation.watchPosition(
+function(position) {
+	console.log(position.coords.latitude, position.coords.longitude);
+	let elem = document.getElementById("elem")
+	elem.innerHTML = position.coords.latitude + ", " + position.coords.longitude + "\n"
+}
+);
+let stop = document.getElementById("stopwatpos").onclick = function (){
+navigator.geolocation.clearWatch(watchID);
+let elem = document.getElementById("elem")
+elem.innerHTML = "stopped"
+}
+}
+
+let position = navigator.geolocation.getCurrentPosition(
+function(position){})
+
+let loc = {
+	latitude: position.coords.latitude,
+    longitude: position.coords.longitude
+};
+var request = new XMLHttpRequest();
+function reqReadyStateChange() {
+    if (request.readyState == 4 && request.status == 200)
+        document.getElementById("elem").innerHTML=request.responseText;
+}
+var body = "lat=" + loc.latitude + "&long="+ loc.longitude;
+request.open("POST", "http://localhost:8080/postdata.php");
+request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+request.onreadystatechange = reqReadyStateChange;
+request.send(body);
+</script>
+</body>
+<html>
+
+    
+    
